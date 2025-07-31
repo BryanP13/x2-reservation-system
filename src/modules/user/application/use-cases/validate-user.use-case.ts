@@ -1,6 +1,8 @@
 // src/modules/user/application/use-cases/validate-user.use-case.ts
 
+import { Injectable, Inject } from '@nestjs/common'; 
 import { IUserRepository } from '../../domain/repositories/user.repository.interface';
+import { USER_REPOSITORY } from '../../domain/repositories/user.repository.interface'; // ✅ usa el token
 import { User } from '../../domain/entities/user.entity';
 
 interface ValidateUserDto {
@@ -8,8 +10,12 @@ interface ValidateUserDto {
   password: string;
 }
 
+@Injectable() // 
 export class ValidateUserUseCase {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    @Inject(USER_REPOSITORY) 
+    private readonly userRepository: IUserRepository
+  ) {}
 
   async execute(dto: ValidateUserDto): Promise<User | null> {
     const user = await this.userRepository.findByEmail(dto.email);

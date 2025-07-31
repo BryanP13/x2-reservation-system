@@ -1,18 +1,16 @@
+// src/modules/auth/auth.module.ts
 import { Module } from '@nestjs/common';
-import { AuthService } from './services/auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
-import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './strategies/jwt.strategy';
+import { AuthService } from './services/auth/auth.service';
 
 @Module({
   imports: [
-    PassportModule,
     JwtModule.register({
-      secret: 'secret', // 🔐 reemplazar luego con variable de entorno
+      secret: 'your-secret-key', // Cambiar por variable de entorno
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  providers: [AuthService, JwtStrategy],
-  exports: [AuthService], // exportamos para poder usar en otros módulos
+  providers: [AuthService],
+  exports: [AuthService], // ← Exportar para usar en otros módulos
 })
 export class AuthModule {}

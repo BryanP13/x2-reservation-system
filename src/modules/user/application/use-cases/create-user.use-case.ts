@@ -1,7 +1,8 @@
 // src/modules/user/application/use-cases/create-user.use-case.ts
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common'; 
 import { IUserRepository } from '../../domain/repositories/user.repository.interface';
+import { USER_REPOSITORY } from '../../domain/repositories/user.repository.interface';
 import { User } from '../../domain/entities/user.entity';
 
 interface CreateUserDto {
@@ -12,7 +13,10 @@ interface CreateUserDto {
 
 @Injectable()
 export class CreateUserUseCase {
-  constructor(private readonly userRepository: IUserRepository) {}
+  constructor(
+    @Inject(USER_REPOSITORY) 
+    private readonly userRepository: IUserRepository
+  ) {}
 
   async execute(dto: CreateUserDto): Promise<User> {
     const existingUser = await this.userRepository.findByEmail(dto.email);

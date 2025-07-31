@@ -8,18 +8,26 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserModule = void 0;
 const common_1 = require("@nestjs/common");
+const user_controller_1 = require("./infrastructure/controllers/user.controller");
 const in_memory_user_repository_1 = require("./infrastructure/repositories/in-memory-user.repository");
 const user_repository_interface_1 = require("./domain/repositories/user.repository.interface");
+const create_user_use_case_1 = require("./application/use-cases/create-user.use-case");
+const validate_user_use_case_1 = require("./application/use-cases/validate-user.use-case");
+const auth_module_1 = require("../auth/auth.module");
 let UserModule = class UserModule {
 };
 exports.UserModule = UserModule;
 exports.UserModule = UserModule = __decorate([
     (0, common_1.Module)({
+        imports: [auth_module_1.AuthModule],
+        controllers: [user_controller_1.UserController],
         providers: [
             {
                 provide: user_repository_interface_1.USER_REPOSITORY,
                 useClass: in_memory_user_repository_1.InMemoryUserRepository,
             },
+            create_user_use_case_1.CreateUserUseCase,
+            validate_user_use_case_1.ValidateUserUseCase,
         ],
         exports: [user_repository_interface_1.USER_REPOSITORY],
     })

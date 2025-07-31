@@ -17,8 +17,7 @@ let AuthService = class AuthService {
     constructor(jwtService) {
         this.jwtService = jwtService;
     }
-    async generateToken(user) {
-        const payload = { email: user.email, sub: user.id };
+    async generateToken(payload) {
         return {
             access_token: this.jwtService.sign(payload),
         };
