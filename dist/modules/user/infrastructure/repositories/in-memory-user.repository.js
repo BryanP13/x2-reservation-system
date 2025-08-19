@@ -8,21 +8,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InMemoryUserRepository = void 0;
 const common_1 = require("@nestjs/common");
+const user_entity_1 = require("../../domain/entities/user.entity");
 let InMemoryUserRepository = class InMemoryUserRepository {
     users = [];
+    counter = 1;
     async create(user) {
-        this.users.push(user);
-        return user;
+        const newUser = new user_entity_1.User(user.name, user.email, user.password, this.counter++);
+        this.users.push(newUser);
+        return newUser;
     }
     async findByEmail(email) {
         return this.users.find(user => user.email === email) || null;
     }
     async validateUser(email, password) {
         const user = await this.findByEmail(email);
-        if (user && user.password === password) {
-            return user;
-        }
-        return null;
+        if (!user)
+            return null;
+        const isValid = await user.isPasswordValid(password);
+        return isValid ? user : null;
     }
 };
 exports.InMemoryUserRepository = InMemoryUserRepository;

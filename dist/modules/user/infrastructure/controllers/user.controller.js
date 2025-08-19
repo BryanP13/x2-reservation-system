@@ -17,7 +17,6 @@ const common_1 = require("@nestjs/common");
 const create_user_use_case_1 = require("../../application/use-cases/create-user.use-case");
 const validate_user_use_case_1 = require("../../application/use-cases/validate-user.use-case");
 const auth_service_1 = require("../../../auth/services/auth/auth.service");
-const passport_1 = require("@nestjs/passport");
 let UserController = class UserController {
     createUserUseCase;
     validateUserUseCase;
@@ -27,42 +26,25 @@ let UserController = class UserController {
         this.validateUserUseCase = validateUserUseCase;
         this.authService = authService;
     }
-    async register(dto) {
-        const user = await this.createUserUseCase.execute(dto);
+    async register(body) {
+        const user = await this.createUserUseCase.execute(body);
+        const { password, ...safeUser } = user.toPrimitives();
         return {
             message: 'User created successfully',
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-            },
+            user: safeUser,
         };
     }
-    async login(dto) {
-        const user = await this.validateUserUseCase.execute(dto);
+    async login(body) {
+        const user = await this.validateUserUseCase.execute(body);
         if (!user) {
-            return {
-                message: 'Invalid credentials',
-            };
+            throw new common_1.HttpException('Invalid email or password', common_1.HttpStatus.UNAUTHORIZED);
         }
-        const token = await this.authService.generateToken({
-            id: user.id.toString(),
-            email: user.email,
-        });
+        const token = await this.authService.generateToken({ id: user.id.toString(), email: user.email });
+        const { password, ...safeUser } = user.toPrimitives();
         return {
             message: 'Login successful',
             access_token: token.access_token,
-            user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-            },
-        };
-    }
-    getProfile(req) {
-        return {
-            message: 'Protected route access granted',
-            user: req.user,
+            user: safeUser,
         };
     }
 };
@@ -81,14 +63,6 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "login", null);
-__decorate([
-    (0, common_1.Get)('profile'),
-    (0, common_1.UseGuards)((0, passport_1.AuthGuard)('jwt')),
-    __param(0, (0, common_1.Request)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], UserController.prototype, "getProfile", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [create_user_use_case_1.CreateUserUseCase,

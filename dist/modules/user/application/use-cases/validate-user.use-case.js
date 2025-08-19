@@ -24,7 +24,7 @@ let ValidateUserUseCase = class ValidateUserUseCase {
         const user = await this.userRepository.findByEmail(dto.email);
         if (!user)
             return null;
-        const isValid = user.isPasswordValid(dto.password);
+        const isValid = await user.isPasswordValid(dto.password);
         if (!isValid)
             return null;
         return user;

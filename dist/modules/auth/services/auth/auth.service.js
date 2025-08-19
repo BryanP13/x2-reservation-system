@@ -18,9 +18,8 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async generateToken(payload) {
-        return {
-            access_token: this.jwtService.sign(payload),
-        };
+        const access_token = await this.jwtService.signAsync(payload);
+        return { access_token };
     }
 };
 exports.AuthService = AuthService;

@@ -6,7 +6,7 @@ export declare class UserController {
     private readonly validateUserUseCase;
     private readonly authService;
     constructor(createUserUseCase: CreateUserUseCase, validateUserUseCase: ValidateUserUseCase, authService: AuthService);
-    register(dto: {
+    register(body: {
         name: string;
         email: string;
         password: string;
@@ -18,14 +18,10 @@ export declare class UserController {
             email: string;
         };
     }>;
-    login(dto: {
+    login(body: {
         email: string;
         password: string;
     }): Promise<{
-        message: string;
-        access_token?: undefined;
-        user?: undefined;
-    } | {
         message: string;
         access_token: string;
         user: {
@@ -34,8 +30,4 @@ export declare class UserController {
             email: string;
         };
     }>;
-    getProfile(req: any): {
-        message: string;
-        user: any;
-    };
 }

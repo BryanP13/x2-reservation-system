@@ -9,10 +9,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InMemoryUserRepository = void 0;
 const common_1 = require("@nestjs/common");
 const user_entity_1 = require("../../../domain/entities/user.entity");
+const bcrypt = require("bcrypt");
 let InMemoryUserRepository = class InMemoryUserRepository {
     users = [];
     async create(user) {
-        const newUser = new user_entity_1.User(user.name, user.email, user.password, this.users.length + 1);
+        const hashedPassword = await bcrypt.hash(user.password, 10);
+        const newUser = new user_entity_1.User(user.name, user.email, hashedPassword, this.users.length + 1);
         this.users.push(newUser);
         return newUser;
     }
@@ -23,7 +25,8 @@ let InMemoryUserRepository = class InMemoryUserRepository {
         const user = await this.findByEmail(email);
         if (!user)
             return null;
-        return user.isPasswordValid(password) ? user : null;
+        const isValid = await user.isPasswordValid(password);
+        return isValid ? user : null;
     }
 };
 exports.InMemoryUserRepository = InMemoryUserRepository;

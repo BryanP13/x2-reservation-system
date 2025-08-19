@@ -1,3 +1,4 @@
+// src/modules/user/infrastructure/repositories/in-memory-user.repository.ts
 import { Injectable } from '@nestjs/common';
 import { IUserRepository } from '../../domain/repositories/user.repository.interface';
 import { User } from '../../domain/entities/user.entity';
@@ -5,10 +6,17 @@ import { User } from '../../domain/entities/user.entity';
 @Injectable()
 export class InMemoryUserRepository implements IUserRepository {
   private users: User[] = [];
+  private counter = 1; // contador para IDs automáticos
 
   async create(user: User): Promise<User> {
-    this.users.push(user);
-    return user;
+    const newUser = new User(
+      user.name,
+      user.email,
+      user.password,
+      this.counter++, // asigna ID y luego incrementa
+    );
+    this.users.push(newUser);
+    return newUser;
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -17,9 +25,9 @@ export class InMemoryUserRepository implements IUserRepository {
 
   async validateUser(email: string, password: string): Promise<User | null> {
     const user = await this.findByEmail(email);
-    if (user && user.password === password) {
-      return user;
-    }
-    return null;
+    if (!user) return null;
+
+    const isValid = await user.isPasswordValid(password);
+    return isValid ? user : null;
   }
 }

@@ -16,6 +16,7 @@ exports.CreateUserUseCase = void 0;
 const common_1 = require("@nestjs/common");
 const user_repository_interface_1 = require("../../domain/repositories/user.repository.interface");
 const user_entity_1 = require("../../domain/entities/user.entity");
+const bcrypt = require("bcrypt");
 let CreateUserUseCase = class CreateUserUseCase {
     userRepository;
     constructor(userRepository) {
@@ -24,9 +25,10 @@ let CreateUserUseCase = class CreateUserUseCase {
     async execute(dto) {
         const existingUser = await this.userRepository.findByEmail(dto.email);
         if (existingUser) {
-            throw new Error('User with this email already exists');
+            throw new common_1.ConflictException('User with this email already exists');
         }
-        const user = new user_entity_1.User(dto.name, dto.email, dto.password);
+        const hashedPassword = await bcrypt.hash(dto.password, 10);
+        const user = new user_entity_1.User(dto.name, dto.email, hashedPassword);
         return await this.userRepository.create(user);
     }
 };

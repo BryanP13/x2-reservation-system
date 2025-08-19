@@ -38,7 +38,8 @@ let UserRepository = class UserRepository {
         const user = await this.findByEmail(email);
         if (!user)
             return null;
-        return user.isPasswordValid(password) ? user : null;
+        const isValid = await user.isPasswordValid(password);
+        return isValid ? user : null;
     }
 };
 exports.UserRepository = UserRepository;

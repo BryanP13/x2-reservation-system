@@ -27,8 +27,11 @@ export class UserRepository implements IUserRepository {
   }
 
   async validateUser(email: string, password: string): Promise<User | null> {
-    const user = await this.findByEmail(email);
-    if (!user) return null;
-    return user.isPasswordValid(password) ? user : null;
+  const user = await this.findByEmail(email);
+  if (!user) return null;
+
+  const isValid = await user.isPasswordValid(password); // ← usa await
+  return isValid ? user : null;
   }
+
 }
